@@ -71,7 +71,7 @@ jobs:
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
       with:
-        swap-size-gb: 12
+        swap-size-gb: 24
 
     - name: Setup TWRP Manifest
       run: |
@@ -117,8 +117,7 @@ jobs:
     - name: Repo Sync
       run: |
         cd android-recovery
-        # repo sync -j$(nproc --all) --force-sync
-        repo sync -j$(nproc --all) --force-sync --no-clone-bundle --no-tags -c # fixes?: error.GitError: Cannot checkout platform/prebuilts/rust: Cannot initialize work tree for platform/prebuilts/rust
+        repo sync -j$(nproc --all) --force-sync --no-clone-bundle --no-tags -c --depth=1
 
     - name: Clone Device Tree
       run: |
