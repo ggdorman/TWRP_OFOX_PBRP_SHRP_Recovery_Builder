@@ -62,7 +62,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v6
-              
+
     - name: Clean-up
       uses: rokibhasansagar/slimhub_actions@main
 
@@ -70,7 +70,7 @@ jobs:
       uses: pierotofy/set-swap-space@master
       with:
         swap-size-gb: 12
-      
+
     - name: Build Environment
       run: |
         sudo apt install aria2 -y
@@ -82,7 +82,7 @@ jobs:
       uses: hendrikmuhs/ccache-action@v1.2
       with:
         max-size: "10G"
-      
+
     - name: Set-up Manifest # For github workspace use single {}
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/OrangeFox
@@ -92,7 +92,7 @@ jobs:
         git clone https://gitlab.com/OrangeFox/sync.git -b master
         cd sync
         ./orangefox_sync.sh --branch ${{ inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}
-      
+
     - name: Clone Device Tree
       run: |
         cd ${{ env.ORANGEFOX_ROOT }}
@@ -110,7 +110,13 @@ jobs:
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         set -e
-        lunch twrp_${{ inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ inputs.BUILD_TARGET }}image
+        BRANCH_NUM=$(echo "${{ inputs.MANIFEST_BRANCH }}" | cut -d. -f1)
+        if [[ "$BRANCH_NUM" -ge 14 ]]; then
+          lunch twrp_${{ inputs.DEVICE_NAME }}-ap2a-eng
+        else
+          lunch twrp_${{ inputs.DEVICE_NAME }}-eng
+        fi
+        make clean && mka adbd ${{ inputs.BUILD_TARGET }}image
         popd
 
     - name: Set Build Date # Build date in UTC
