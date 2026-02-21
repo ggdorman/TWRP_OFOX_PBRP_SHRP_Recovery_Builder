@@ -130,7 +130,13 @@ jobs:
         cd android-recovery
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
-        lunch ${{ inputs.MAKEFILE_NAME }}-eng && make clean && make ${{ inputs.BUILD_TARGET }}image -j$(nproc --all)
+        BRANCH_NUM=$(echo "${{ inputs.MANIFEST_BRANCH }}" | sed 's/^twrp-//' | cut -d. -f1)
+        if [[ "$BRANCH_NUM" -ge 14 ]]; then
+          lunch ${{ inputs.MAKEFILE_NAME }}-ap2a-eng
+        else
+          lunch ${{ inputs.MAKEFILE_NAME }}-eng
+        fi
+        make clean && make ${{ inputs.BUILD_TARGET }}image -j$(nproc --all)
         echo "Done building your ${{ inputs.BUILD_TARGET }}.img"
 
     - name: Set Build Date # Output will be use in Release
